@@ -19,7 +19,7 @@ driver = webdriver.Chrome(ChromeDriverManager().install())
 
 provider_type = "psychiatrists"
 insurance = "unitedhealthcare"
-location = "ca/oakland"  # "94619"
+location = "ny/new-york"  # "94619"
 
 
 def main():
@@ -52,7 +52,16 @@ def phone_number_from_component(comp):
     try:
         return comp.find("div", {"class", "result-phone"}).text.strip()
     except:
-        return
+        return "Couldn't find phone"
+
+
+def name_from_component(comp):
+    try:
+        name = comp.find("a", {"class", "result-name"}).text.strip()
+        name = name.strip().split()
+        return name[0] + " " + name[1]
+    except:
+        return "Couldn't find name"
 
 
 def scrape_me(url):  # input parameter = string url to pyschologytoday's website
@@ -71,13 +80,21 @@ def scrape_me(url):  # input parameter = string url to pyschologytoday's website
 
         page += 1
         print("\n Page ", page, "\n")
-        # print(soup.find("div", {"class": "row results-content"}).contents[1].contents)
+        # print(
+        #     soup.find("div", {"class": "row results-content results-teletherapy"})
+        #     .contents[1]
+        #     .contents
+        # )
+
         for result in (
-            soup.find("div", {"class": "row results-content"}).contents[1].contents
+            soup.find("div", {"class": "row results-content results-teletherapy"})
+            .contents[1]
+            .contents
         ):
             if result.name == "div":
                 # print(result.name)
-                print(phone_number_from_component(result))
+                print("name: ", name_from_component(result))
+                print("phone: ", phone_number_from_component(result), "\n")
 
         next_button = soup.find("a", {"class", "btn-next"})
         if (
